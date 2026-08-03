@@ -6,16 +6,14 @@ Users reported that the company website was unavailable.
 
 Reported issue:
 
-> "Unable to connect to the server."
+> "Unable to connect to the website."
 
-No maintenance window or planned changes were reported.
-
-The goal was to determine whether the issue was related to:
+The objective was to determine whether the issue was caused by:
 
 * server availability,
-* networking,
-* web service availability,
-* or application failure.
+* network connectivity,
+* web service failure,
+* or application configuration.
 
 ---
 
@@ -44,12 +42,12 @@ Findings:
 This ruled out:
 
 * complete server outage,
-* network connectivity failure preventing administration,
-* system unavailability.
+* loss of administrative access,
+* basic network failure.
 
 ---
 
-## Step 2: Test Local Web Connectivity
+## Step 2: Test HTTP Connectivity
 
 Tested whether the web service was responding locally.
 
@@ -62,20 +60,19 @@ curl -I http://localhost
 Result:
 
 ```text
-curl: (7) Failed to connect to localhost port 80 after 0 ms: Connection refused
+curl: (7) Failed to connect to localhost port 80: Connection refused
 ```
 
 Findings:
 
-The server was running, but nothing was accepting connections on HTTP port 80.
-
-This indicated the issue was likely related to a missing or failed web service.
+* The server was online.
+* No service was accepting HTTP connections on port 80.
 
 ---
 
-## Step 3: Verify Listening Ports
+## Step 3: Check Listening Ports
 
-Because the specific web server software was unknown, checked active listening ports instead of assuming a service.
+Checked active listening ports to determine whether a web service was running.
 
 Command:
 
@@ -83,66 +80,240 @@ Command:
 sudo ss -tulpn
 ```
 
-Result:
-
-```text
-tcp   LISTEN 0 4096 0.0.0.0:22 0.0.0.0:* users:(("sshd",pid=812,fd=3))
-tcp   LISTEN 0 4096 [::]:22    [::]:*    users:(("sshd",pid=812,fd=4))
-```
-
 Findings:
 
-Only SSH was listening.
+* SSH was listening on port 22.
+* No service was listening on port 80 or 443.
 
-No services were listening on:
+Conclusion:
 
-* TCP port 80 (HTTP)
-* TCP port 443 (HTTPS)
+The issue was likely related to a missing or failed web server service.
 
 ---
 
-# Root Cause Investigation Status
+## Step 4: Identify Web Server Service
 
-The investigation determined:
+Checked active systemd services.
 
-* The server was online.
-* SSH access was functioning.
-* The operating system was healthy.
-* No web service was actively listening.
-
-The next investigation step would be identifying whether the expected web service was:
-
-* stopped,
-* missing,
-* disabled,
-* or failing during startup.
-
-Potential next commands:
+Command:
 
 ```bash
 systemctl list-units --type=service
 ```
 
-to identify available web server services.
+Findings:
+
+No web server service was active.
+
+Next, checked installed service units:
+
+```bash
+systemctl list-unit-files --type=service
+```
+
+Result:
+
+```text
+apache2.service enabled enabled
+```
+
+Conclusion:
+
+Apache was installed but not running.
+
+---
+
+## Step 5: Investigate Apache Failure
+
+Checked Apache service status.
+
+Command:
+
+```bash
+sudo systemctl status apache2
+```
+
+Finding:
+
+Apache failed during startup.
+
+Error:
+
+```text
+AH00526: Syntax error on line 18 of /etc/apache2/apache2.conf
+
+Invalid command 'ServerNmae'
+```
+
+Root cause identified:
+
+The Apache configuration file contained a typo.
+
+Incorrect:
+
+```apache
+ServerNmae web01.company.local
+```
+
+Correct:
+
+```apache
+ServerName web01.company.local
+```
+
+---
+
+# Resolution
+
+## Step 1: Correct Apache Configuration
+
+Edited the Apache configuration file:
+
+```bash
+sudo nano /etc/apache2/apache2.conf
+```
+
+Changed:
+
+```apache
+ServerNmae
+```
+
+to:
+
+```apache
+ServerName
+```
+
+---
+
+## Step 2: Validate Configuration
+
+Before restarting Apache, tested the configuration.
+
+Command:
+
+```bash
+sudo apachectl configtest
+```
+
+Result:
+
+```text
+Syntax OK
+```
+
+---
+
+## Step 3: Restart Apache
+
+Restarted the web service.
+
+Command:
+
+```bash
+sudo systemctl restart apache2
+```
+
+Verified service status:
+
+```bash
+sudo systemctl status apache2
+```
+
+Result:
+
+```text
+Active: active (running)
+```
+
+---
+
+## Step 4: Validate Website Availability
+
+Tested HTTP response:
+
+```bash
+curl -I http://localhost
+```
+
+Result:
+
+```text
+HTTP/1.1 200 OK
+Server: Apache/2.4.58 (Ubuntu)
+```
+
+Verified Apache was listening:
+
+```bash
+sudo ss -tulpn | grep :80
+```
+
+Result:
+
+Apache successfully listening on port 80.
+
+---
+
+# Root Cause
+
+Apache was unavailable because a syntax error in the Apache configuration prevented the service from starting.
+
+The typo:
+
+```text
+ServerNmae
+```
+
+caused Apache configuration parsing to fail.
 
 ---
 
 # Skills Demonstrated
 
-* Incident response workflow
-* Service troubleshooting methodology
-* Using SSH for remote administration
-* Testing network services with curl
-* Inspecting listening ports with ss
-* Avoiding assumptions about installed services
-* Building evidence before making changes
+* Linux service troubleshooting
+* systemd service management
+* Apache administration
+* Configuration debugging
+* Log/error message analysis
+* HTTP troubleshooting
+* Network port validation
+* Safe configuration changes
+* Service recovery validation
 
 ---
 
 # Key Takeaways
 
-* Always verify server accessibility before troubleshooting applications.
-* A closed port does not automatically mean a networking problem.
-* "Connection refused" usually means the host is reachable but no process is accepting connections.
-* Use discovery tools before assuming a specific service exists.
-* Troubleshooting should move from symptoms toward the responsible component.
+* A website outage does not always indicate a network problem.
+* "Connection refused" usually means the host is reachable but no service is accepting connections.
+* Identify the responsible component before making changes.
+* Always validate configuration files before restarting production services.
+* Successful troubleshooting requires verifying both the fix and the original user issue.
+
+---
+
+# Troubleshooting Pattern Used
+
+```
+User reports outage
+        ↓
+Verify server access
+        ↓
+Test application connectivity
+        ↓
+Check listening ports
+        ↓
+Identify responsible service
+        ↓
+Review service status/logs
+        ↓
+Fix root cause
+        ↓
+Validate configuration
+        ↓
+Restart service
+        ↓
+Confirm recovery
+```

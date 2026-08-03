@@ -1,0 +1,74 @@
+Symptom → First Component to Investigate
+
+Website unavailable
+→ Web server (nginx/apache)
+→ systemctl status nginx/apache2
+→ journalctl -u nginx/apache2
+→ ss -tulpn
+
+DNS failure
+→ DNS service / configuration
+→ systemd-resolved
+→ resolvectl status
+→ resolvectl query example.com
+
+SSH issue
+→ SSH daemon
+→ ssh.service
+→ journalctl -u ssh
+→ /etc/ssh/sshd_config
+→ firewall rules
+
+Backups not running
+→ Scheduler + script
+→ cron/systemd timers
+→ journalctl
+→ script logs
+→ permissions
+
+Can't resolve hostnames
+→ DNS configuration
+→ /etc/resolv.conf
+→ systemd-resolved
+→ network configuration
+
+Disk full
+→ Filesystem/storage
+→ df -h
+→ du -sh
+→ logs
+→ deleted-but-open files
+
+Permission denied
+→ File ownership/security
+→ ls -l
+→ chown/chmod
+→ groups
+→ ACLs
+
+High CPU
+→ Processes/applications
+→ top/htop
+→ ps aux
+→ system logs
+
+High memory usage
+→ Processes/services
+→ free -h
+→ top
+→ memory leaks
+→ application logs
+
+Network connectivity issue
+→ Network stack
+→ ip addr
+→ ip route
+→ ping
+→ traceroute
+→ firewall
+
+Service won't start
+→ systemd + logs
+→ systemctl status
+→ journalctl -u service
+→ configuration files
