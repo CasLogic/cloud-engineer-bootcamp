@@ -1,26 +1,20 @@
-# Cloud Engineer Bootcamp
+Cloud Engineer Portfolio
 
-Welcome to my Cloud Engineer Bootcamp portfolio.
+This repository documents my journey toward becoming a Cloud Engineer through hands-on projects, troubleshooting labs, and infrastructure automation.
 
-This repository documents my transition into cloud engineering through hands-on labs, troubleshooting exercises, and real-world infrastructure projects.
+Rather than completing isolated tutorials, every project in this portfolio follows the same engineering workflow:
 
-## Goals
+Learn → Build → Break → Troubleshoot → Document → Commit
 
-- Build strong Linux administration skills
-- Learn Azure cloud administration
-- Automate infrastructure with Python and Bash
-- Deploy infrastructure using Terraform
-- Containerize applications with Docker
-- Build production-style cloud projects
-- Document every project professionally
+Skills demonstrated include:
 
-## Technologies
+• Linux Administration
+• Networking
+• Bash Scripting
+• Azure Infrastructure
+• Infrastructure as Code (Terraform)
+• Docker
+• Monitoring
+• Cloud Troubleshooting
 
-- Linux
-- Git
-- GitHub
-- Azure
-- Python
-- Bash
-- Terraform
-- Docker
+Each project contains documentation explaining both the implementation and the troubleshooting process used during development.
