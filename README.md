@@ -18,3 +18,15 @@ Skills demonstrated include:
 • Cloud Troubleshooting
 
 Each project contains documentation explaining both the implementation and the troubleshooting process used during development.
+
+## Completed Sprints
+
+### Sprint 1 — Azure Linux VM Deployment ✅
+
+- Designed Azure networking
+- Deployed Ubuntu Server
+- Configured secure SSH access
+- Installed Apache
+- Resolved Azure quota issues
+- Diagnosed NSG connectivity issues
+- Validated external web access
