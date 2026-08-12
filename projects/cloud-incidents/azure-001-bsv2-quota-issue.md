@@ -39,18 +39,15 @@ The Pay-As-You-Go subscription did not have access to deploy Standard Bsv2 virtu
 
 ## Resolution
 
-Submitted an Azure support request requesting access to the Standard Bsv2 family with a quota of **2 vCPUs**.
+Submitted an Azure quota request for the Standard Bsv2 Family requesting 2 vCPUs in East US.
 
-Awaiting Microsoft support response.
+Microsoft approved the quota increase.
 
 ## Validation
 
-Pending support approval.
+Verified that the Standard Bsv2 Family quota was increased.
 
-After approval:
-
-- Deploy Standard Bsv2 virtual machine.
-- Verify successful deployment.
+Successfully able to select Bsv2 virtual machines for deployment.
 
 ## Lessons Learned
 
