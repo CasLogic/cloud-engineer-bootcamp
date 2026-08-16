@@ -166,3 +166,16 @@ Resolution:
 ## Sprint Status
 
 ✅ Sprint 1 Complete
+
+## Labs Completed
+
+- Azure Virtual Machine Deployment
+- SSH Key Authentication
+- Apache Web Server Deployment
+- Azure CLI Administration
+- Azure Networking & NSG Troubleshooting
+- Linux Service Troubleshooting
+- Azure Managed Disk Administration
+- Linux Storage Management
+- Persistent Filesystem Mounting
+- Azure Cost Management
