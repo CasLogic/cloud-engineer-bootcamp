@@ -178,4 +178,5 @@ Resolution:
 - Azure Managed Disk Administration
 - Linux Storage Management
 - Persistent Filesystem Mounting
+- Azure Disaster Recovery with Managed Disk Snapshots
 - Azure Cost Management
