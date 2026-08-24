@@ -1,0 +1,11 @@
+#cloud-config
+
+package_update: true
+
+packages:
+  - nginx
+
+runcmd:
+  - systemctl enable nginx
+  - systemctl start nginx
+  - echo "Terraform Lesson 2 - cloud-init configured this VM" > /var/www/html/index.html
