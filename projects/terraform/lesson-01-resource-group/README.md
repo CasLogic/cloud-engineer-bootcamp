@@ -112,3 +112,38 @@ ssh
 ## Outcome
 
 Successfully deployed, validated, and destroyed an Azure Linux environment entirely through Terraform while troubleshooting real Azure platform constraints.
+## Managed Data Disk
+
+Extended the Terraform-managed Linux VM with persistent Azure storage.
+
+### Infrastructure
+
+Terraform was used to:
+
+- Create a 4 GB Azure Managed Disk.
+- Attach the disk to the existing Linux VM.
+- Manage the disk attachment as a separate Terraform resource.
+
+### Linux Configuration
+
+After attachment, Linux detected the new disk as `/dev/sdb`.
+
+The disk was then:
+
+- Partitioned as `/dev/sdb1`.
+- Formatted with ext4.
+- Mounted at `/data`.
+- Added to `/etc/fstab` using its UUID for persistent mounting.
+
+### Validation
+
+- Verified the disk with `lsblk`.
+- Confirmed `/data` was mounted successfully.
+- Created a test file on the data disk.
+- Rebooted the VM.
+- Confirmed `/data` remounted automatically.
+- Confirmed the test file survived the reboot.
+
+### Key Takeaway
+
+Terraform managed the Azure infrastructure layer by creating and attaching the managed disk, while Linux administration was required to partition, format, mount, and persist the filesystem inside the guest OS.

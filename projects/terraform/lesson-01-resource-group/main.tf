@@ -10,6 +10,9 @@ provider "azurerm" {
   features {}
 }
 locals {
+  project_name = "terraform-lab"
+  name_suffix  = var.environment
+
   tags = merge(
     var.common_tags,
     {
@@ -18,12 +21,12 @@ locals {
   )
 }
 resource "azurerm_resource_group" "lab" {
-  name     = "rg-terraform-lab-${var.environment}"
+  name = "rg-${local.project_name}-${local.name_suffix}"
   location = var.location
   tags = local.tags
 }
 resource "azurerm_virtual_network" "vnet" {
-  name                = "vnet-terraform-lab-${var.environment}"
+  name = "vnet-${local.project_name}-${local.name_suffix}"
   location            = azurerm_resource_group.lab.location
   resource_group_name = azurerm_resource_group.lab.name
 
@@ -31,7 +34,7 @@ resource "azurerm_virtual_network" "vnet" {
   tags = local.tags
 }
 resource "azurerm_subnet" "subnet" {
-  name                 = "subnet-web-${var.environment}"
+  name = "subnet-web-${local.name_suffix}"
   resource_group_name  = azurerm_resource_group.lab.name
   virtual_network_name = azurerm_virtual_network.vnet.name
 
@@ -39,7 +42,7 @@ resource "azurerm_subnet" "subnet" {
   
 }
 resource "azurerm_network_security_group" "web_nsg" {
-  name                = "nsg-web-${var.environment}"
+  name = "nsg-web-${local.name_suffix}"
   location            = azurerm_resource_group.lab.location
   resource_group_name = azurerm_resource_group.lab.name
   security_rule {
@@ -71,7 +74,7 @@ resource "azurerm_subnet_network_security_group_association" "web_nsg_assoc" {
   network_security_group_id = azurerm_network_security_group.web_nsg.id
 }
 resource "azurerm_public_ip" "web_public_ip" {
-  name                = "pip-web-${var.environment}"
+  name = "pip-web-${local.name_suffix}"
   location            = azurerm_resource_group.lab.location
   resource_group_name = azurerm_resource_group.lab.name
   allocation_method   = "Static"
@@ -79,7 +82,7 @@ resource "azurerm_public_ip" "web_public_ip" {
   tags = local.tags
 }
 resource "azurerm_network_interface" "web_nic" {
-  name                = "nic-web-${var.environment}"
+  name = "nic-web-${local.name_suffix}"
   location            = azurerm_resource_group.lab.location
   resource_group_name = azurerm_resource_group.lab.name
 
@@ -92,7 +95,7 @@ resource "azurerm_network_interface" "web_nic" {
   tags = local.tags
 }
 resource "azurerm_linux_virtual_machine" "web_vm" {
-  name                = "vm-web01-${var.environment}"
+  name = "vm-web01-${local.name_suffix}"
   resource_group_name = azurerm_resource_group.lab.name
   location            = azurerm_resource_group.lab.location
   size                = var.vm_size
