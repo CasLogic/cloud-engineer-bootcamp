@@ -9,3 +9,39 @@ runcmd:
   - systemctl enable nginx
   - systemctl start nginx
   - echo "Terraform Lesson 2 - cloud-init configured this VM" > /var/www/html/index.html
+
+    # Wait for attached data disk
+  - |
+    until [ -b /dev/sdb ]; do
+      sleep 2
+    done
+
+  # Create partition if it does not exist
+  - |
+    if [ ! -b /dev/sdb1 ]; then
+      printf 'n\np\n1\n\n\nw\n' | fdisk /dev/sdb
+      partprobe /dev/sdb
+      udevadm settle
+    fi
+
+  # Create filesystem only if one does not already exist
+  - |
+    if [ -z "$(blkid -s TYPE -o value /dev/sdb1)" ]; then
+      mkfs.ext4 /dev/sdb1
+    fi
+
+  # Create mount point
+  - mkdir -p /data
+
+  # Add persistent mount
+  - |
+    UUID=$(blkid -s UUID -o value /dev/sdb1)
+    if ! grep -q "UUID=$UUID " /etc/fstab; then
+      echo "UUID=$UUID /data ext4 defaults,nofail 0 2" >> /etc/fstab
+    fi
+
+  # Mount disk
+  - mount -a
+
+  # Validation file
+  - touch /data/cloud-init-disk-test.txt
